@@ -1,0 +1,5 @@
+.idea
+StarCitizenPatchTracker.iml
+StarCitizenFileTracker/StarCitizenFileTracker.iml
+StarCitizenFileTracker/pom.xml
+/StarCitizenFileTracker/target/
