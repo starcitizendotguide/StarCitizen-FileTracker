@@ -60,8 +60,10 @@ public class FileTracker {
         Stream.of(directory.listFiles())
             .forEach(e -> {
 
-                if(this.exclude.contains(e.getName())) {
-                    System.out.println("Skipped excluded file: " + e.getAbsolutePath());
+                String displayPath = e.getAbsolutePath().replace(this.rootDir.getAbsolutePath(), "");
+
+                if(this.exclude.stream().filter(displayPath::startsWith).findFirst().isPresent()) {
+                    System.out.println("Skipped excluded file: " + displayPath);
                     return;
                 }
 
@@ -71,7 +73,7 @@ public class FileTracker {
                 if(e.isFile()) {
                     try {
                         hash = this.hash(e);
-                        System.out.println(e.getAbsolutePath().replace(this.rootDir.getAbsolutePath(), "") + " (" + hash + ")");
+                        System.out.println(displayPath+ " (" + hash + ")");
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
