@@ -4,7 +4,7 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,7 +16,7 @@ public class FileTracker {
     private final static int BUFFER_SIZE = (1024 * 8);
 
     private final File rootDir;
-    private final MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+    private final MessageDigest messageDigest;
 
     private final List<String> exclude;
 
@@ -25,9 +25,10 @@ public class FileTracker {
     /**
      * @param rootDir The root directory.
      */
-    public FileTracker(String rootDir, List<String> exclude) throws NoSuchAlgorithmException {
+    public FileTracker(String rootDir, String hash, List<String> exclude) throws NoSuchAlgorithmException {
 
         this.rootDir = new File(rootDir);
+        this.messageDigest =  MessageDigest.getInstance(hash);
 
         this.exclude = exclude;
         System.out.println(rootDir);
@@ -50,7 +51,7 @@ public class FileTracker {
         if(this.fileHierarchy == null) {
 
             // @TODO also hashes for folders... maybe later, just not yet :)
-            this.fileHierarchy = new FileHierarchy(directory, null);
+            this.fileHierarchy = new FileHierarchy(directory, this.hash(directory));
             currentNode = this.fileHierarchy.getRoot();
 
         }
@@ -66,18 +67,10 @@ public class FileTracker {
                 }
 
                 // Lets generate hashes...
-                String hash = null;
+                String hash = this.hash(e);
+                System.out.println(pathAsString(e) + " (" + hash + ")");
 
-                if(e.isFile()) {
-                    try {
-                        hash = this.hash(e);
-                        System.out.println(pathAsString(e) + " (" + hash + ")");
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-                FileHierarchyNode node = new FileHierarchyNode(e, hash); //@TODO hash for files...
+                FileHierarchyNode node = new FileHierarchyNode(e, hash);
                 finalCurrentNode.add(node);
 
                 // next level
@@ -88,18 +81,49 @@ public class FileTracker {
             });
     }
 
-    private String hash(File file) throws IOException {
+    /**
+     * Creates the hash of a file and directory.
+     * @param file The file or directory to be hashed.
+     * @return Returns a SHA-256 hash string.
+     */
+    private String hash(File file)  {
 
-        this.messageDigest.reset();
-        DigestInputStream digestInputStream = new DigestInputStream(new FileInputStream(file), this.messageDigest);
+        try {
 
-        byte[] buffer = new byte[BUFFER_SIZE];
-        while (digestInputStream.read(buffer, 0, BUFFER_SIZE) != -1);
+            this.messageDigest.reset();
 
-        return HexBin.encode(this.messageDigest.digest());
+            if(file.isFile()) {
+
+                DigestInputStream digestInputStream = new DigestInputStream(new FileInputStream(file), this.messageDigest);
+
+                byte[] buffer = new byte[BUFFER_SIZE];
+                while (digestInputStream.read(buffer, 0, BUFFER_SIZE) != -1) ;
+
+
+            } else if(file.isDirectory()) {
+
+                StringBuilder builder = new StringBuilder();
+                this.hashDirectory(file, builder);
+                this.messageDigest.update(builder.toString().getBytes(Charset.forName("UTF-8")));
+
+
+            }
+
+            return HexBin.encode(this.messageDigest.digest());
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
 
     }
 
+    /**
+     * Checks if a file should be excluded.
+     * @param file
+     * @return
+     */
     private boolean exclude(File file) {
 
         String path = pathAsString(file);
@@ -112,6 +136,11 @@ public class FileTracker {
         return value;
     }
 
+    /**
+     * Returns the path of the file relative to the start directory.
+     * @param file
+     * @return
+     */
     private String pathAsString(File file) {
 
         if(file == null) {
@@ -119,6 +148,25 @@ public class FileTracker {
         }
 
         return file.getAbsolutePath().replace(this.rootDir.getAbsolutePath(), "");
+
+    }
+
+    /**
+     * Builds a string of a directory to create unique hash of it.
+     * @param directory The directory to start in.
+     * @param builder The StringBuilder containing the string that is going to be hashed.
+     */
+    private void hashDirectory(File directory, StringBuilder builder) {
+
+        Stream.of(directory.listFiles()).forEachOrdered(e -> {
+
+            builder.append(e.getName()).append(e.length());
+
+            if(e.isDirectory()) {
+                this.hashDirectory(e, builder);
+            }
+
+        });
 
     }
 

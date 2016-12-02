@@ -22,13 +22,18 @@ public class StarCitizenFileTracker {
         Option path = new Option("p", "path", true, "The path to the root folder of Star Citizen.");
         path.setRequired(true);
 
+        Option hash = new Option("h", "hash", true, "The hash algorithm used to hash directories and files.");
+        hash.setRequired(true);
+
         Option exclude = new Option("e", "exclude", true, "All files and or folders excluded from the file tracker; separated by comma (,).");
 
         Option output = new Option("o", "output", true, "The path to file to put the JSON result.");
 
+
         StarCitizenFileTracker.options.addOption(path);
         StarCitizenFileTracker.options.addOption(exclude);
         StarCitizenFileTracker.options.addOption(output);
+        StarCitizenFileTracker.options.addOption(hash);
 
     }
 
@@ -51,10 +56,11 @@ public class StarCitizenFileTracker {
 
         // options parsed
         String path = commandLine.getOptionValue("path");
+        String hash = commandLine.getOptionValue("hash");
         String[] exclude = commandLine.getOptionValue("exclude").split(",");
         Optional<String> output = Optional.ofNullable(commandLine.getOptionValue("output"));
 
-        FileTracker fileTracker = new FileTracker(path, Arrays.asList(exclude));
+        FileTracker fileTracker = new FileTracker(path, hash, Arrays.asList(exclude));
         FileHierarchy fileHierarchy = fileTracker.parse();
 
         //output

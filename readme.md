@@ -2,7 +2,7 @@
 
 The file tracker is a system that runs in the root directory of the Star Citizen files and creates of all included files and sub-dirs a hash; this allows us to compare new versions with each other and keep track of what changed. - Well, to be honest, the File Tracker can create these trees with hashsums for everything, it is currenlty (!) not exclusive to StarCitizen, but I hope that I can implement some features to make it more valuable for Star Citizen.
 
-The project starts with Star Citizen Version 2.6.
+The project starts with Star Citizen Version 2.5.
 
 # How to run?
 
@@ -10,15 +10,20 @@ You can build the project or simply run it in your IDE after cloning it. I am cu
 
 ```
 --path="E:\Program Files\Cloud Imperium Games"
+--hash="SHA-256"
 --output="C:\Users\Yonas\Downloads\output.json"
---exclude=\Patcher\Config\,\Patcher\Patcher.log,\Patcher\debug.log,\StarCitizen\Public\LogBackups\,\StarCitizen\Public\client.crt,\StarCitizen\Public\system.cfg,\StarCitizen\Public\Controls\,\StarCitizen\Public\loginData.cfg,\StarCitizen\Public\Game.log,\StarCitizen\Public\USER\DATABASE\,\StarCitizen\Public\USER\Profiles\,\StarCitizen\Public\SavedGames\,\StarCitizen\Public\game.cfg
+--exclude=\Patcher\config\,\Patcher\Patcher.log,\Patcher\debug.log,\StarCitizen\Public\LogBackups\,\StarCitizen\Public\client.crt,\StarCitizen\Public\system.cfg,\StarCitizen\Public\Controls\,\StarCitizen\Public\loginData.cfg,\StarCitizen\Public\Game.log,\StarCitizen\Public\USER\DATABASE\,\StarCitizen\Public\USER\Profiles\,\StarCitizen\Public\SavedGames\,\StarCitizen\Public\game.cfg
 ```
 
-`path` is my path to thje installation of Star Citizen.
+`hash` the hash algorithm used to hash the directories and files. 
+
+`path` is my path to the installation of Star Citizen.
+
 `output` is the path to the file that is going to contain the output.
+
 `exclude` is a parameter to exclude dirs or files from being included. I am currently not tracking:
 
-- \Patcher\Config\
+- \Patcher\config\
 - \Patcher\Patcher.log
 - \Patcher\debug.log
 - \StarCitizen\Public\ScreenShots\
