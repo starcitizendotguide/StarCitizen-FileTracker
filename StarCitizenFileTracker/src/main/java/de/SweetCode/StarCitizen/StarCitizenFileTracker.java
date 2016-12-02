@@ -1,37 +1,81 @@
 package de.SweetCode.StarCitizen;
 
 import com.google.gson.Gson;
+import org.apache.commons.cli.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class StarCitizenFileTracker {
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
+    private final static Options options = new Options();
 
-        FileTracker fileTracker = new FileTracker("E:\\Program Files\\Cloud Imperium Games", new ArrayList<String>() {{
+    static {
 
-            this.add("\\Patcher\\");
+        Option path = new Option("p", "path", true, "The path to the root folder of Star Citizen.");
+        path.setRequired(true);
 
-            this.add("\\StarCitizen\\Public\\ScreenShots\\");
-            this.add("\\StarCitizen\\Public\\LogBackups\\");
-            this.add("\\StarCitizen\\Public\\\\client.crt");
-            this.add("\\StarCitizen\\Public\\system.cfg");
-            this.add("\\StarCitizen\\Public\\Controls\\");
-            this.add("\\StarCitizen\\Public\\loginData.cfg");
-            this.add("\\StarCitizen\\Public\\Game.log");
+        Option exclude = new Option("e", "exclude", true, "All files and or folders excluded from the file tracker; separated by comma (,).");
 
-            this.add("\\StarCitizen\\Public\\USER\\Database\\");
-            this.add("\\StarCitizen\\Public\\USER\\Profiles\\");
-            this.add("\\StarCitizen\\Public\\USER\\SavedGames\\");
-            this.add("\\StarCitizen\\Public\\USER\\game.cfg");
+        Option output = new Option("o", "output", true, "The path to file to put the JSON result.");
 
+        StarCitizenFileTracker.options.addOption(path);
+        StarCitizenFileTracker.options.addOption(exclude);
+        StarCitizenFileTracker.options.addOption(output);
 
+    }
 
-        }});
+    public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+
+        CommandLine commandLine;
+
+        try {
+            commandLine = parser.parse(StarCitizenFileTracker.options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("StarCitizen File Tracker", StarCitizenFileTracker.options);
+
+            System.exit(1);
+            return;
+        }
+
+        // options parsed
+        String path = commandLine.getOptionValue("path");
+        String[] exclude = commandLine.getOptionValue("exclude").split(",");
+        Optional<String> output = Optional.ofNullable(commandLine.getOptionValue("output"));
+
+        FileTracker fileTracker = new FileTracker(path, Arrays.asList(exclude));
         FileHierarchy fileHierarchy = fileTracker.parse();
 
-        System.out.println(new Gson().toJson(fileHierarchy));
+        //output
+        String outputData = new Gson().toJson(fileHierarchy);
+
+        if(output.isPresent()) {
+            File outputFile = new File(output.get());
+
+            if (!(outputFile.exists())) {
+                outputFile.createNewFile();
+            }
+
+            if (outputFile.isFile()) {
+                Files.write(Paths.get(outputFile.getAbsolutePath()), outputData.getBytes(Charset.forName("UTF-8")), StandardOpenOption.WRITE);
+            } else {
+                System.out.println("The output path is not a file.");
+                System.out.println(outputData);
+            }
+        } else {
+            System.out.println(outputData);
+        }
 
     }
 

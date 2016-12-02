@@ -30,7 +30,7 @@ public class FileTracker {
         this.rootDir = new File(rootDir);
 
         this.exclude = exclude;
-
+        System.out.println(rootDir);
         if(!(this.rootDir.exists()) || !(this.rootDir.isDirectory())) {
             throw new IllegalArgumentException("The given rootDir path is not a directory or does not exist.");
         }
@@ -55,15 +55,13 @@ public class FileTracker {
 
         }
 
+
         FileHierarchyNode finalCurrentNode = currentNode;
 
         Stream.of(directory.listFiles())
             .forEach(e -> {
 
-                String displayPath = e.getAbsolutePath().replace(this.rootDir.getAbsolutePath(), "");
-
-                if(this.exclude.stream().filter(displayPath::startsWith).findFirst().isPresent()) {
-                    System.out.println("Skipped excluded file: " + displayPath);
+                if(this.exclude(e)) {
                     return;
                 }
 
@@ -73,7 +71,7 @@ public class FileTracker {
                 if(e.isFile()) {
                     try {
                         hash = this.hash(e);
-                        System.out.println(displayPath+ " (" + hash + ")");
+                        System.out.println(pathAsString(e) + " (" + hash + ")");
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -90,7 +88,7 @@ public class FileTracker {
             });
     }
 
-    private final String hash(File file) throws IOException {
+    private String hash(File file) throws IOException {
 
         this.messageDigest.reset();
         DigestInputStream digestInputStream = new DigestInputStream(new FileInputStream(file), this.messageDigest);
@@ -99,6 +97,28 @@ public class FileTracker {
         while (digestInputStream.read(buffer, 0, BUFFER_SIZE) != -1);
 
         return HexBin.encode(this.messageDigest.digest());
+
+    }
+
+    private boolean exclude(File file) {
+
+        String path = pathAsString(file);
+        boolean value = this.exclude.stream().filter(path::startsWith).findFirst().isPresent();
+
+        if(value) {
+            System.out.println("Skipped excluded file: " + path);
+        }
+
+        return value;
+    }
+
+    private String pathAsString(File file) {
+
+        if(file == null) {
+            return "null";
+        }
+
+        return file.getAbsolutePath().replace(this.rootDir.getAbsolutePath(), "");
 
     }
 
