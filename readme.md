@@ -11,7 +11,7 @@ You can build the project or simply run it in your IDE after cloning it. I am cu
 ```
 --path="E:\Program Files\Cloud Imperium Games"
 --output="C:\Users\Yonas\Downloads\output.json"
---exclude=\Patcher\,\StarCitizen\Public\LogBackups\,\StarCitizen\Public\client.crt,\StarCitizen\Public\system.cfg,\StarCitizen\Public\Controls\,\StarCitizen\Public\loginData.cfg,\StarCitizen\Public\Game.log,\StarCitizen\Public\USER\DATABASE\,\StarCitizen\Public\USER\Profiles\,\StarCitizen\Public\SavedGames\,\StarCitizen\Public\game.cfg
+--exclude=\Patcher\Config\,\Patcher\Patcher.log,\Patcher\debug.log,\StarCitizen\Public\LogBackups\,\StarCitizen\Public\client.crt,\StarCitizen\Public\system.cfg,\StarCitizen\Public\Controls\,\StarCitizen\Public\loginData.cfg,\StarCitizen\Public\Game.log,\StarCitizen\Public\USER\DATABASE\,\StarCitizen\Public\USER\Profiles\,\StarCitizen\Public\SavedGames\,\StarCitizen\Public\game.cfg
 ```
 
 `path` is my path to thje installation of Star Citizen.
