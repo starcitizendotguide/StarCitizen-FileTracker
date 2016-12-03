@@ -12,7 +12,7 @@ You can build the project or simply run it in your IDE after cloning it. I am cu
 --path="E:\Program Files\Cloud Imperium Games"
 --hash="SHA-256"
 --output="C:\Users\Yonas\Downloads\output.json"
---exclude=\Patcher\config\,\Patcher\Patcher.log,\Patcher\debug.log,\StarCitizen\Public\LogBackups\,\StarCitizen\Public\client.crt,\StarCitizen\Public\system.cfg,\StarCitizen\Public\Controls\,\StarCitizen\Public\loginData.cfg,\StarCitizen\Public\Game.log,\StarCitizen\Public\USER\DATABASE\,\StarCitizen\Public\USER\Profiles\,\StarCitizen\Public\SavedGames\,\StarCitizen\Public\game.cfg
+--exclude=\Patcher\config\,\Patcher\Patcher.log,\Patcher\debug.log,\StarCitizen\Public\LogBackups\,\StarCitizen\Public\client.crt,\StarCitizen\Public\system.cfg,\StarCitizen\Public\Controls\,\StarCitizen\Public\loginData.cfg,\StarCitizen\Public\Game.log,\StarCitizen\Public\USER\DATABASE\,\StarCitizen\Public\USER\Profiles\,\StarCitizen\Public\SavedGames\,\StarCitizen\Public\game.cfg,\StarCitizen\Test\
 ```
 
 `hash` the hash algorithm used to hash the directories and files. 
@@ -37,6 +37,7 @@ You can build the project or simply run it in your IDE after cloning it. I am cu
 - \StarCitizen\Public\USER\Profiles\
 - \StarCitizen\Public\USER\SavedGames\
 - \StarCitizen\Public\USER\game.cfg
+- \StarCitizen\Test
 
 I am excluding these files and sub-dirs because they contain unique content that is only related to every player not to the game files itself. You can also choose to not exclude any files, even though I have to warn you, because this could compromise the security of your data. I highly recommend for security reasons to exclude: `\StarCitizen\Public\loginData.cfg` and `\StarCitizen\Public\client.crt`. There might be other files that should be excluded that I have not found yet, if you found one feel free to create an issue to suggest it.
 
