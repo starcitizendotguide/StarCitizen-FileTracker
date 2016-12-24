@@ -1,6 +1,8 @@
 package de.SweetCode.StarCitizen;
 
 import com.google.gson.Gson;
+import difflib.DiffUtils;
+import difflib.Patch;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -11,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 public class StarCitizenFileTracker {
@@ -26,14 +29,14 @@ public class StarCitizenFileTracker {
         hash.setRequired(true);
 
         Option exclude = new Option("e", "exclude", true, "All files and or folders excluded from the file tracker; separated by comma (,).");
-
         Option output = new Option("o", "output", true, "The path to file to put the JSON result.");
-
+        Option compare = new Option("c", "compareTo", true, "The path to the file to compare to.");
 
         StarCitizenFileTracker.options.addOption(path);
         StarCitizenFileTracker.options.addOption(exclude);
         StarCitizenFileTracker.options.addOption(output);
         StarCitizenFileTracker.options.addOption(hash);
+        StarCitizenFileTracker.options.addOption(compare);
 
     }
 
@@ -59,12 +62,27 @@ public class StarCitizenFileTracker {
         String hash = commandLine.getOptionValue("hash");
         String[] exclude = commandLine.getOptionValue("exclude").split(",");
         Optional<String> output = Optional.ofNullable(commandLine.getOptionValue("output"));
+        Optional<String> compare = Optional.ofNullable(commandLine.getOptionValue("compareTo"));
 
         FileTracker fileTracker = new FileTracker(path, hash, Arrays.asList(exclude));
         FileHierarchy fileHierarchy = fileTracker.parse();
 
         //output
         String outputData = new Gson().toJson(fileHierarchy);
+
+        //compare
+        if(compare.isPresent()) {
+            File compareFile = new File(compare.get());
+
+            if(compareFile.isFile()) {
+                Patch<String> patch = DiffUtils.diff(Collections.singletonList(outputData), Files.readAllLines(Paths.get(compareFile.getAbsolutePath())));
+                fileHierarchy.setDeltas(patch.getDeltas());
+
+                System.out.println("Saved deltas from comparing.");
+            } else {
+                System.out.println("The compareTo file is not a file or does not exist.");
+            }
+        }
 
         if(output.isPresent()) {
             File outputFile = new File(output.get());
