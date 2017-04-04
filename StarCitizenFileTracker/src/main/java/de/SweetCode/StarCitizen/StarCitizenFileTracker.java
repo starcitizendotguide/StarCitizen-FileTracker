@@ -95,11 +95,10 @@ public class StarCitizenFileTracker {
                 Files.write(Paths.get(outputFile.getAbsolutePath()), outputData.getBytes(Charset.forName("UTF-8")), StandardOpenOption.WRITE);
             } else {
                 System.out.println("The output path is not a file.");
-                System.out.println(outputData);
             }
-        } else {
-            System.out.println(outputData);
         }
+
+        System.out.println(outputData);
 
     }
 
